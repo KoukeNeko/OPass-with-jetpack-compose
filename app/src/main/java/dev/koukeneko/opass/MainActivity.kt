@@ -133,13 +133,13 @@ fun AppContent() {
     val backStackEntry = navController.currentBackStackEntryAsState()
 
     Scaffold(
-        bottomBar = {
-            NavigationBarComponent(
-                bottomNavItems = bottomNavItems,
-                backStackEntry = backStackEntry,
-                navController = navController
-            )
-        },
+//        bottomBar = {
+//            NavigationBarComponent(
+//                bottomNavItems = bottomNavItems,
+//                backStackEntry = backStackEntry,
+//                navController = navController
+//            )
+//        },
         topBar = {
             AppBar(
                 subtitle = "KoukeNeko",

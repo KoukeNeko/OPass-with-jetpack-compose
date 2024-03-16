@@ -45,6 +45,26 @@ fun HomeScreen(
     navController: NavController
 ) {
     val buttons = listOf(
+        PanelButton("快速通關", ticket()) {
+            navController.navigate(
+                "profile"
+            )
+        },
+        PanelButton("議程", calendar_clock()) {
+            navController.navigate(
+                "profile"
+            )
+        },
+        PanelButton("我的票券", qrcode()) {
+            navController.navigate(
+                "profile"
+            )
+        },
+        PanelButton("大地遊戲", puzzle()) {
+            navController.navigate(
+                "profile"
+            )
+        },
         PanelButton("大會公告", speakerphone()) {
             navController.navigate(
                 "profile"
