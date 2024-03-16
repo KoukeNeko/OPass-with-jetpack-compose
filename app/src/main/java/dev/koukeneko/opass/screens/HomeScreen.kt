@@ -1,27 +1,25 @@
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -33,12 +31,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import dev.koukeneko.opass.R
-import dev.koukeneko.opass.components.AppBar
 import dev.koukeneko.opass.components.PanelBtn
 import kotlinx.coroutines.launch
 
@@ -47,6 +44,55 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     navController: NavController
 ) {
+    val buttons = listOf(
+        PanelButton("大會公告", speakerphone()) {
+            navController.navigate(
+                "profile"
+            )
+        },
+        PanelButton("WiFi", wifi()) {
+            navController.navigate(
+                "profile"
+            )
+        },
+        PanelButton("會場地圖", map()) {
+            navController.navigate(
+                "profile"
+            )
+        },
+        PanelButton("合作夥伴", cash()) {
+            navController.navigate(
+                "profile"
+            )
+        },
+        PanelButton("工作人員", user_grop()) {
+            navController.navigate(
+                "profile"
+            )
+        },
+        PanelButton("個人贊助支持", heart()) {
+            navController.navigate(
+                "profile"
+            )
+        },
+        PanelButton("Telegram", telegram()) {
+            navController.navigate(
+                "profile"
+            )
+        },
+        PanelButton("Discord", discord()) {
+            navController.navigate(
+                "profile"
+            )
+        },
+        PanelButton("IRC Log", chat()) {
+            navController.navigate(
+                "profile"
+            )
+        },
+    )
+
+
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -75,37 +121,20 @@ fun HomeScreen(
             )
         }
         Spacer(modifier = Modifier.height(10.dp))
-        Row(
-            horizontalArrangement = Arrangement.SpaceAround,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp)
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(4), // Fixed count of 4 items per row
+            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            PanelBtn(
-                title = "公告",
-                icon = painterResource(id =R.drawable.rounded_chat_info_24),
-                onClick = { navController.navigate("profile")},
-                color = MaterialTheme.colorScheme.primary
-            )
-            PanelBtn(
-                title = "WiFi",
-                icon = painterResource(id =R.drawable.rounded_wifi_24),
-                onClick = { /*TODO*/ },
-                color = MaterialTheme.colorScheme.primary
-            )
-            PanelBtn(
-                title = "會場",
-                icon = painterResource(id =R.drawable.rounded_map_24),
-                onClick = { /*TODO*/ },
-                color = MaterialTheme.colorScheme.primary
-            )
-            PanelBtn(
-                title = "贊助商",
-                icon = painterResource(id =R.drawable.rounded_monetization_on_24),
-                onClick = { /*TODO*/ },
-                color = MaterialTheme.colorScheme.primary
-            )
-
+            items(buttons) { button ->
+                PanelBtn(
+                    title = button.title,
+                    icon = button.icon,
+                    onClick = button.onClick,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
     if (showBottomSheet) {
@@ -148,3 +177,9 @@ fun HomeScreen(
         }
     }
 }
+
+data class PanelButton(
+    val title: String,
+    val icon: ImageVector,
+    val onClick: () -> Unit
+)

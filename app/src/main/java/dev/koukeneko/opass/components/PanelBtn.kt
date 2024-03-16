@@ -2,6 +2,7 @@ package dev.koukeneko.opass.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -29,7 +30,9 @@ fun PanelBtn(
         color = color
     ) {
         Icon(
-            modifier = Modifier.fillMaxSize().padding(5.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(5.dp),
             imageVector = icon,
             contentDescription = title,
             tint = MaterialTheme.colorScheme.onPrimary
@@ -50,7 +53,9 @@ fun PanelBtn(
         color = color
     ) {
         Icon(
-            modifier = Modifier.fillMaxSize().padding(5.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(5.dp),
             painter = icon,
             contentDescription = title,
             tint = MaterialTheme.colorScheme.onPrimary
@@ -76,6 +81,7 @@ private fun PanelBtnBase(
         ) {
             content()
         }
+        Spacer(modifier = Modifier.padding(2.dp))
         Text(title, style = MaterialTheme.typography.bodySmall)
     }
 }
