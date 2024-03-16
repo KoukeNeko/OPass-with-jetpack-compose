@@ -4,10 +4,12 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.navigation.NavHostController
 
 @Composable
 fun WebViewScreen(
-    url: String = "https://google.com.tw"
+    url: String = "https://google.com.tw",
+    navController: NavHostController
 ){
 
     AndroidView(
