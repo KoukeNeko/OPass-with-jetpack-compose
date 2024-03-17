@@ -17,9 +17,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -329,7 +332,13 @@ fun HomeScreen(
                     }
                 } else {
                     item {
-                        Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
+
+                        if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.R) {
+                            Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
+                            Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
+                        }else{
+                            Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
+                        }
                     }
                 }
 
