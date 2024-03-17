@@ -1,4 +1,5 @@
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,18 +9,27 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -30,16 +40,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import dev.koukeneko.opass.R
+import dev.koukeneko.opass.components.AppBar
 import dev.koukeneko.opass.components.PanelBtn
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun HomeScreen(
     navController: NavController
@@ -117,82 +133,162 @@ fun HomeScreen(
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(false) }
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-//                    .background(Color.Red)
-        ) {
-            Image(
-                SITCON_white(),
-                contentDescription = "SITCON Logo",
-                modifier = Modifier
-                    .width(250.dp)
-                    .height(200.dp)
-                    .align(Alignment.BottomCenter)
-//                        .background(Color.Magenta)
-            )
-        }
-        Spacer(modifier = Modifier.height(10.dp))
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(4), // Fixed count of 4 items per row
-            contentPadding = PaddingValues(horizontal = 10.dp, vertical = 10.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            items(buttons) { button ->
-                PanelBtn(
-                    title = button.title,
-                    icon = button.icon,
-                    onClick = button.onClick,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
-    }
-    if (showBottomSheet) {
-        ModalBottomSheet(
-            onDismissRequest = {
-                showBottomSheet = false
-            },
-            sheetState = sheetState
-        ) {
-            Row {
-                TextField(value = "dsa", onValueChange = {
-                    /*TODO*/
-                })
-                Button(onClick = { /*TODO*/ }) {
-//                                search icon
-                    Icon(Icons.Filled.Search, contentDescription = "Localized description")
-                }
-            }
-            Column {
-                Card {
-                    Text("Sheet content")
-                }
-                Card {
-                    Text("Sheet content")
-                }
-                Card {
-                    Text("Sheet content")
-                }
-            }
-            // Sheet content
-            Button(onClick = {
-                scope.launch { sheetState.hide() }.invokeOnCompletion {
-                    if (!sheetState.isVisible) {
-                        showBottomSheet = false
+    Scaffold(
+        topBar = {
+            AppBar(
+                subtitle = "KoukeNeko",
+                title = "SITCON 2024",
+                rightIcon = {
+                    IconButton(onClick = { /* Do something */ }) {
+                        Icon(Icons.Filled.Settings, contentDescription = "Localized description")
+                    }
+                },
+        leftIcon = {
+                    IconButton(onClick = {
+                        showBottomSheet = true
+                    }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.rounded_stack_24),
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            contentDescription = "Localized description",
+                        )
                     }
                 }
-            }) {
-                Text("Hide bottom sheet")
+            )
+        }
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(it)
+                .fillMaxSize()
+        ) {
+
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+//                    .background(Color.Red)
+            ) {
+                Image(
+                    SITCON_white(),
+                    contentDescription = "SITCON Logo",
+                    modifier = Modifier
+                        .width(250.dp)
+                        .height(200.dp)
+                        .align(Alignment.BottomCenter)
+//                        .background(Color.Magenta)
+                )
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(4), // Fixed count of 4 items per row
+                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 10.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                items(buttons) { button ->
+                    PanelBtn(
+                        title = button.title,
+                        icon = button.icon,
+                        onClick = button.onClick,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        }
+        var search_event by remember { mutableStateOf("") }
+        val events = listOf("SITCON 2024", "DevFest Taipei 2023", "Event 3", "Event 4", "Event 5", "Event 6", "Event 7", "Event 8", "Event 9", "Event 10","Event 11", "Event 12", "Event 13", "Event 14", "Event 15", "Event 16", "Event 17", "Event 18", "Event 19", "Event 20")
+        val filteredItems = events.filter { it -> it.contains(search_event, ignoreCase = true) }
+
+
+        if (showBottomSheet) {
+            ModalBottomSheet(
+
+                onDismissRequest = {
+                    showBottomSheet = false
+                },
+                sheetState = sheetState
+            ) {
+
+                Column(
+                    modifier = Modifier.padding(10.dp, 0.dp, 10.dp, 0.dp),
+                ) {
+
+                    LazyColumn {
+                        item {
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(10.dp)
+                            ) {
+                                Row(
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                ) {
+                                    TextField(
+
+                                        label = { Row {
+                                            Icon(Icons.Rounded.Search, contentDescription = "Localized description")
+                                            Text("搜尋活動")
+                                        } },
+                                        modifier = Modifier.fillParentMaxWidth(),
+                                        value = search_event,
+                                        onValueChange = {
+                                            search_event = it
+                                    })
+                                    Button(
+                                        modifier = Modifier.width(50.dp),
+                                        onClick = { /*TODO*/ }) {
+//                                search icon
+                                        Icon(Icons.Filled.Search, contentDescription = "Localized description")
+                                    }
+                                }
+                            }
+                        }
+                        items(filteredItems) { event ->
+
+                            Card(
+                                modifier = Modifier
+
+                                    .fillMaxWidth()
+                                    .padding(10.dp)
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Absolute.SpaceBetween,
+                                    modifier = Modifier.fillMaxWidth().clickable { /*TODO*/ }
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        Image(imageVector = SITCON_white(), contentDescription = event, modifier = Modifier
+                                            .padding(10.dp)
+                                            .height(75.dp))
+                                        Text(
+                                            text = event,
+                                        )
+                                    }
+                                    Icon(imageVector = chevron_right(), contentDescription = event, modifier = Modifier
+                                        .padding(end = 10.dp)
+                                        .height(30.dp), tint = MaterialTheme.colorScheme.onSurface)
+                                }
+                            }
+                        }
+                    }
+                }
+                // Sheet content
+                Button(onClick = {
+                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            showBottomSheet = false
+                        }
+                    }
+                }) {
+                    Text("Hide bottom sheet")
+                }
             }
         }
     }

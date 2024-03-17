@@ -132,41 +132,11 @@ fun AppContent() {
     // NavController is passed via parameter
     val backStackEntry = navController.currentBackStackEntryAsState()
 
-    Scaffold(
-//        bottomBar = {
-//            NavigationBarComponent(
-//                bottomNavItems = bottomNavItems,
-//                backStackEntry = backStackEntry,
-//                navController = navController
-//            )
-//        },
-        topBar = {
-            AppBar(
-                subtitle = "KoukeNeko",
-                title = "SITCON 2024",
-                rightIcon = {
-                    IconButton(onClick = { /* Do something */ }) {
-                        Icon(Icons.Filled.Settings, contentDescription = "Localized description")
-                    }
-                },
-                leftIcon = {
-                    IconButton(onClick = {
 
-                    }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.rounded_stack_24),
-                            tint = MaterialTheme.colorScheme.onSurface,
-                            contentDescription = "Localized description",
-                        )
-                    }
-                }
-            )
-        },
-    ) {
         NavHost(
             navController = navController,
             startDestination = "home",
-            modifier = Modifier.fillMaxSize().padding(it)
+            modifier = Modifier.fillMaxSize()
         ) {
             composable("home") {
 
@@ -186,7 +156,7 @@ fun AppContent() {
 
             }
 
-        }
+
     }
 
 }
