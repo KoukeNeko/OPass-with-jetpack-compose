@@ -16,6 +16,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -24,6 +26,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,6 +47,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -248,25 +252,35 @@ fun HomeScreen(
                                 }
                             }
                         }
-                        items(filteredItems) { event ->
-
+                        item {
+                            Spacer(modifier = Modifier.height(10.dp))
+                        }
+                        itemsIndexed(filteredItems) { index, event ->
+                            val shape = when (index) {
+                                0 -> RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)
+                                events.lastIndex -> RoundedCornerShape(bottomStart = 10.dp, bottomEnd = 10.dp)
+                                else -> RoundedCornerShape(0.dp)
+                            }
                             Card(
+                                shape = shape,
                                 modifier = Modifier
-
                                     .fillMaxWidth()
-                                    .padding(10.dp)
+                                    .padding(start = 10.dp, end = 10.dp)
                             ) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.Absolute.SpaceBetween,
-                                    modifier = Modifier.fillMaxWidth().clickable { /*TODO*/ }
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable { /*TODO*/ }
                                 ) {
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
                                         Image(imageVector = SITCON_white(), contentDescription = event, modifier = Modifier
                                             .padding(10.dp)
-                                            .height(75.dp))
+                                            .height(70.dp)
+                                            .width(100.dp))
                                         Text(
                                             text = event,
                                         )
@@ -276,6 +290,15 @@ fun HomeScreen(
                                         .height(30.dp), tint = MaterialTheme.colorScheme.onSurface)
                                 }
                             }
+                            if (index < events.lastIndex) {
+                                Divider(
+                                    color = Color.Transparent,
+                                    thickness = 1.dp,
+                                )
+                            }
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(20.dp))
                         }
                     }
                 }
