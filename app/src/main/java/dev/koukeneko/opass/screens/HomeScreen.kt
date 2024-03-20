@@ -136,28 +136,7 @@ fun HomeScreen(
 
 
     var search_event by remember { mutableStateOf("") }
-//    val events = listOf(
-//        "SITCON 2024",
-//        "DevFest Taipei 2023",
-//        "Event 3",
-//        "Event 4",
-//        "Event 5",
-//        "Event 6",
-//        "Event 7",
-//        "Event 8",
-//        "Event 9",
-//        "Event 10",
-//        "Event 11",
-//        "Event 12",
-//        "Event 13",
-//        "Event 14",
-//        "Event 15",
-//        "Event 16",
-//        "Event 17",
-//        "Event 18",
-//        "Event 19",
-//        "Event 20"
-//    )
+
     val events = remember { mutableStateListOf<Event>() }
 
     LaunchedEffect(key1 = true) {
