@@ -38,6 +38,11 @@ import dev.koukeneko.opass.screens.WebViewScreen
 import dev.koukeneko.opass.structs.BottomNavItem
 import dev.koukeneko.opass.ui.theme.OPassTheme
 
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,52 +100,7 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppContent() {
-
-    val bottomNavItems = listOf(
-        BottomNavItem(
-            name = "首頁",
-            route = "home",
-            icon = { Icon(Icons.Rounded.Home, contentDescription = "Home") }
-        ),
-        BottomNavItem(
-            name = "快速通關",
-            route = "fast_pass",
-            icon = {
-                Icon(
-                    painterResource(id = R.drawable.rounded_confirmation_number_24),
-                    contentDescription = "Fast Pass"
-                )
-            }
-        ),
-        BottomNavItem(
-            name = "我的票券",
-            route = "ticket",
-            icon = {
-                Icon(
-                    painterResource(id = R.drawable.rounded_qr_code_24),
-                    contentDescription = "Ticket"
-                )
-            }
-        ),
-        BottomNavItem(
-            name = "議程",
-            route = "schedule",
-            icon = {
-                Icon(
-                    painterResource(id = R.drawable.rounded_format_list_numbered_24),
-                    contentDescription = "Schedule"
-                )
-            }
-        ),
-
-        )
-
-
     val navController = rememberNavController()
-    // NavController is passed via parameter
-    val backStackEntry = navController.currentBackStackEntryAsState()
-
-
     NavHost(
         navController = navController,
         startDestination = "home",
