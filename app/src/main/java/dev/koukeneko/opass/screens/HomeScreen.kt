@@ -159,7 +159,7 @@ fun HomeScreen(
 //        "Event 20"
 //    )
     val events = remember { mutableStateListOf<Event>() }
-    // 在Compose中使用LaunchedEffect来处理挂起函数
+
     LaunchedEffect(key1 = true) {
         val fetchedEvents = EventClient().getEvents()
         events.clear()
@@ -172,8 +172,8 @@ fun HomeScreen(
     val scope = rememberCoroutineScope()
     val scaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberStandardBottomSheetState(
-            initialValue = SheetValue.Hidden,
-            skipHiddenState = false
+            initialValue = SheetValue.PartiallyExpanded,
+            skipHiddenState = true
         )
     )
 
@@ -182,7 +182,7 @@ fun HomeScreen(
     BackHandler(scaffoldState.bottomSheetState.isVisible, onBack = {
         //hide bottom sheet
         scope.launch {
-            scaffoldState.bottomSheetState.hide()
+            scaffoldState.bottomSheetState.partialExpand()
         }
     })
 
@@ -214,7 +214,7 @@ fun HomeScreen(
             )
         },
         scaffoldState = scaffoldState,
-        sheetPeekHeight = 0.dp,
+        sheetPeekHeight = 90.dp,
         sheetContent = {
             LazyColumn(
                 modifier = Modifier
