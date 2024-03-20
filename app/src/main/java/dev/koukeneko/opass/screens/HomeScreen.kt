@@ -146,13 +146,16 @@ fun HomeScreen(
         Logger.getLogger("HomeScreen Fetched events").info("Fetched events: $fetchedEvents")
     }
 
-    val filteredItems = events.filter { event -> event.displayName["zh"]?.contains(search_event, ignoreCase = true) == true}
+    val filteredItems = events.filter { event ->
+        event.displayName["zh"]?.contains(
+            search_event, ignoreCase = true
+        ) == true
+    }
 
     val scope = rememberCoroutineScope()
     val scaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = rememberStandardBottomSheetState(
-            initialValue = SheetValue.PartiallyExpanded,
-            skipHiddenState = true
+            initialValue = SheetValue.PartiallyExpanded, skipHiddenState = true
         )
     )
 
@@ -167,164 +170,152 @@ fun HomeScreen(
 
 
 
-    BottomSheetScaffold(
-        topBar = {
-            AppBar(
-                subtitle = "KoukeNeko",
-                title = "SITCON 2024",
-                rightIcon = {
-                    IconButton(onClick = { /* Do something */ }) {
-                        Icon(Icons.Filled.Settings, contentDescription = "Localized description")
-                    }
-                },
-                leftIcon = {
-                    IconButton(onClick = {
-                        scope.launch {
-                            scaffoldState.bottomSheetState.expand()
-                        }
-                    }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.rounded_login_24),
-                            tint = MaterialTheme.colorScheme.onSurface,
-                            contentDescription = "Localized description",
-                        )
-                    }
+    BottomSheetScaffold(topBar = {
+        AppBar(subtitle = "KoukeNeko", title = "SITCON 2024", rightIcon = {
+            IconButton(onClick = { /* Do something */ }) {
+                Icon(Icons.Filled.Settings, contentDescription = "Localized description")
+            }
+        }, leftIcon = {
+            IconButton(onClick = {
+                scope.launch {
+                    scaffoldState.bottomSheetState.expand()
                 }
-            )
-        },
-        scaffoldState = scaffoldState,
-        sheetPeekHeight = 90.dp,
-        sheetContent = {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(start = 10.dp, end = 10.dp),
-            ) {
-                item {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(10.dp)
+            }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.rounded_login_24),
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    contentDescription = "Localized description",
+                )
+            }
+        })
+    }, scaffoldState = scaffoldState, sheetPeekHeight = 90.dp, sheetContent = {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(start = 10.dp, end = 10.dp),
+        ) {
+            item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                        TextField(singleLine = true,
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Rounded.Search,
+                                    contentDescription = "Localized description"
+                                )
+                            },
+                            label = { Text("搜尋活動") },
                             modifier = Modifier
-                                .fillMaxWidth()
-                        ) {
-                            TextField(
-                                singleLine = true,
-                                leadingIcon = {
-                                    Icon(
-                                        Icons.Rounded.Search,
-                                        contentDescription = "Localized description"
-                                    )
-                                },
-                                label = { Text("搜尋活動") },
-                                modifier = Modifier.fillParentMaxWidth().padding(start = 15.dp),
-                                value = search_event,
-                                onValueChange = {
-                                    search_event = it
-                                })
-                        }
+                                .fillParentMaxWidth()
+                                .padding(start = 15.dp),
+                            value = search_event,
+                            onValueChange = {
+                                search_event = it
+                            })
                     }
                 }
-                item {
-                    Spacer(modifier = Modifier.height(10.dp))
-                }
-                itemsIndexed(filteredItems) { index, event ->
-                    val shape = when (index) {
-                        0 -> if (filteredItems.size == 1) {
-                            // If there's only one item, apply rounded corners to all sides
-                            RoundedCornerShape(10.dp)
-                        } else {
-                            // First item, only round the top corners
-                            RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)
-                        }
-
-                        filteredItems.lastIndex -> RoundedCornerShape(
-                            bottomStart = 10.dp,
-                            bottomEnd = 10.dp
-                        )
-
-                        else -> RoundedCornerShape(0.dp)
+            }
+            item {
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+            itemsIndexed(filteredItems) { index, event ->
+                val shape = when (index) {
+                    0 -> if (filteredItems.size == 1) {
+                        // If there's only one item, apply rounded corners to all sides
+                        RoundedCornerShape(10.dp)
+                    } else {
+                        // First item, only round the top corners
+                        RoundedCornerShape(topStart = 10.dp, topEnd = 10.dp)
                     }
-                    Card(
-                        shape = shape,
+
+                    filteredItems.lastIndex -> RoundedCornerShape(
+                        bottomStart = 10.dp, bottomEnd = 10.dp
+                    )
+
+                    else -> RoundedCornerShape(0.dp)
+                }
+                Card(
+                    shape = shape,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 10.dp, end = 10.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Absolute.SpaceBetween,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 10.dp, end = 10.dp)
-                    ) {
+                            .clickable { /*TODO*/ }) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Absolute.SpaceBetween,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { /*TODO*/ }
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                AsyncImage(
-                                    model = event.logoUrl,
-                                    contentDescription = event.displayName["zh"],
-                                    modifier = Modifier
-                                        .padding(10.dp)
-                                        .height(70.dp)
-                                        .width(100.dp)
-                                )
-
-                                event.displayName["zh"]?.let {
-                                    Text(
-                                        text = it,
-                                    )
-                                }
-                            }
-                            Icon(
-                                imageVector = chevron_right(),
+                            AsyncImage(
+                                model = event.logoUrl,
                                 contentDescription = event.displayName["zh"],
                                 modifier = Modifier
-                                    .padding(end = 10.dp)
-                                    .height(30.dp),
-                                tint = MaterialTheme.colorScheme.onSurface
+                                    .padding(10.dp)
+                                    .height(70.dp)
+                                    .width(100.dp)
                             )
+
+                            event.displayName["zh"]?.let {
+                                Text(
+                                    text = it,
+                                )
+                            }
                         }
-                    }
-                    if (index < events.lastIndex) {
-                        Divider(
-                            color = Color.Transparent,
-                            thickness = 1.dp,
+                        Icon(
+                            imageVector = chevron_right(),
+                            contentDescription = event.displayName["zh"],
+                            modifier = Modifier
+                                .padding(end = 10.dp)
+                                .height(30.dp),
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
-                if (filteredItems.isEmpty()) {
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(10.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(text = "找不到符合的活動")
-                        }
-                    }
-                } else {
-                    item {
-
-                        if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.R) {
-                            Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
-                            Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
-                        }else{
-                            Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
-                        }
+                if (index < events.lastIndex) {
+                    Divider(
+                        color = Color.Transparent,
+                        thickness = 1.dp,
+                    )
+                }
+            }
+            if (filteredItems.isEmpty()) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "找不到符合的活動")
                     }
                 }
-
+            } else {
                 item {
-                    Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.ime)) //can remove
+
+                    if (android.os.Build.VERSION.SDK_INT <= android.os.Build.VERSION_CODES.R) {
+                        Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
+                        Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
+                    } else {
+                        Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
+                    }
                 }
             }
 
-        }) { innerPadding ->
+            item {
+                Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.ime)) //can remove
+            }
+        }
+
+    }) { innerPadding ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
@@ -369,7 +360,5 @@ fun HomeScreen(
 }
 
 data class PanelButton(
-    val title: String,
-    val icon: ImageVector,
-    val onClick: () -> Unit
+    val title: String, val icon: ImageVector, val onClick: () -> Unit
 )
