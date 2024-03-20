@@ -184,7 +184,7 @@ fun HomeScreen(
                         }
                     }) {
                         Icon(
-                            painter = painterResource(id = R.drawable.rounded_stack_24),
+                            painter = painterResource(id = R.drawable.rounded_login_24),
                             tint = MaterialTheme.colorScheme.onSurface,
                             contentDescription = "Localized description",
                         )
