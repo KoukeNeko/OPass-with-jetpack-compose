@@ -16,7 +16,7 @@ class EventClient {
     private var baseUrl = "https://portal.opass.app/events/"
 
     suspend fun getEvents(): List<Event> {
-        // 发起GET请求并显式地获取响应体作为String
+
         val response = client.get(baseUrl)
         val responseBody: String = response.body()
 
