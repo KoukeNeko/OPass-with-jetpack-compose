@@ -40,6 +40,7 @@ import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -52,10 +53,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import dev.koukeneko.opass.R
-import dev.koukeneko.opass.api.EventClient
 import dev.koukeneko.opass.components.AppBar
 import dev.koukeneko.opass.components.PanelBtn
+import dev.koukeneko.opass.structs.Event
 import kotlinx.coroutines.launch
 import java.util.logging.Logger
 
@@ -134,30 +136,38 @@ fun HomeScreen(
 
 
     var search_event by remember { mutableStateOf("") }
-    val events = listOf(
-        "SITCON 2024",
-        "DevFest Taipei 2023",
-        "Event 3",
-        "Event 4",
-        "Event 5",
-        "Event 6",
-        "Event 7",
-        "Event 8",
-        "Event 9",
-        "Event 10",
-        "Event 11",
-        "Event 12",
-        "Event 13",
-        "Event 14",
-        "Event 15",
-        "Event 16",
-        "Event 17",
-        "Event 18",
-        "Event 19",
-        "Event 20"
-    )
+//    val events = listOf(
+//        "SITCON 2024",
+//        "DevFest Taipei 2023",
+//        "Event 3",
+//        "Event 4",
+//        "Event 5",
+//        "Event 6",
+//        "Event 7",
+//        "Event 8",
+//        "Event 9",
+//        "Event 10",
+//        "Event 11",
+//        "Event 12",
+//        "Event 13",
+//        "Event 14",
+//        "Event 15",
+//        "Event 16",
+//        "Event 17",
+//        "Event 18",
+//        "Event 19",
+//        "Event 20"
+//    )
+    val events = remember { mutableStateListOf<Event>() }
+    // 在Compose中使用LaunchedEffect来处理挂起函数
+    LaunchedEffect(key1 = true) {
+        val fetchedEvents = EventClient().getEvents()
+        events.clear()
+        events.addAll(fetchedEvents)
+        Logger.getLogger("HomeScreen Fetched events").info("Fetched events: $fetchedEvents")
+    }
 
-    val filteredItems = events.filter { it -> it.contains(search_event, ignoreCase = true) }
+    val filteredItems = events.filter { event -> event.displayName["zh"]?.contains(search_event, ignoreCase = true) == true}
 
     val scope = rememberCoroutineScope()
     val scaffoldState = rememberBottomSheetScaffoldState(
@@ -175,18 +185,7 @@ fun HomeScreen(
             scaffoldState.bottomSheetState.hide()
         }
     })
-    val textscope = rememberCoroutineScope()
-    var text by remember { mutableStateOf("Loading") }
-    LaunchedEffect(true) {
-        textscope.launch {
-            text = try {
-                EventClient().greeting()
-            } catch (e: Exception) {
-                e.localizedMessage ?: "error"
-            }
-            Logger.getGlobal().info(text)
-        }
-    }
+
 
 
     BottomSheetScaffold(
@@ -242,7 +241,7 @@ fun HomeScreen(
                                     )
                                 },
                                 label = { Text("搜尋活動") },
-                                modifier = Modifier.fillParentMaxWidth(),
+                                modifier = Modifier.fillParentMaxWidth().padding(start = 15.dp),
                                 value = search_event,
                                 onValueChange = {
                                     search_event = it
@@ -286,21 +285,24 @@ fun HomeScreen(
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                Image(
-                                    imageVector = SITCON_white(),
-                                    contentDescription = event,
+                                AsyncImage(
+                                    model = event.logoUrl,
+                                    contentDescription = event.displayName["zh"],
                                     modifier = Modifier
                                         .padding(10.dp)
                                         .height(70.dp)
                                         .width(100.dp)
                                 )
-                                Text(
-                                    text = event,
-                                )
+
+                                event.displayName["zh"]?.let {
+                                    Text(
+                                        text = it,
+                                    )
+                                }
                             }
                             Icon(
                                 imageVector = chevron_right(),
-                                contentDescription = event,
+                                contentDescription = event.displayName["zh"],
                                 modifier = Modifier
                                     .padding(end = 10.dp)
                                     .height(30.dp),
@@ -350,7 +352,7 @@ fun HomeScreen(
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            Text(text)
+//            Text(text)
 
             Box(
                 contentAlignment = Alignment.Center,
