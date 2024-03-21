@@ -1,5 +1,4 @@
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -56,21 +55,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import dev.koukeneko.opass.EventViewModel
 import dev.koukeneko.opass.R
+import dev.koukeneko.opass.api.EventClient
 import dev.koukeneko.opass.components.AppBar
 import dev.koukeneko.opass.components.PanelBtn
 import dev.koukeneko.opass.structs.Event
 import dev.koukeneko.opass.structs.EventListItem
-import dev.koukeneko.opass.structs.Feature
 import kotlinx.coroutines.launch
 import java.util.logging.Logger
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun HomeScreen(
-    navController: NavController
+    navController: NavController,
 ) {
-
 
     val buttons = remember { mutableStateListOf<PanelButton>() }
 
@@ -304,14 +303,14 @@ fun HomeScreen(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
+                    .height(180.dp)
             ) {
-                Image(
-                    SITCON_white(),
+                AsyncImage(
+                    model = "https://sitcon.org/branding/assets/logos/withname-white.png",
                     contentDescription = "SITCON Logo",
                     modifier = Modifier
                         .width(250.dp)
-                        .height(200.dp)
+                        .height(180.dp)
                         .align(Alignment.BottomCenter),
                     colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
                 )

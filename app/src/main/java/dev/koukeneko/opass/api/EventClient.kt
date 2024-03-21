@@ -1,3 +1,5 @@
+package dev.koukeneko.opass.api
+
 import dev.koukeneko.opass.structs.Event
 import dev.koukeneko.opass.structs.EventDate
 import dev.koukeneko.opass.structs.EventListItem
