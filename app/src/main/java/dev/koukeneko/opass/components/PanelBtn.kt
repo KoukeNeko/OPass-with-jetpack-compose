@@ -14,6 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
@@ -57,7 +59,9 @@ fun PanelBtn(
         AsyncImage(
             model = iconUrl,
             contentDescription = title,
-            modifier = Modifier.height(30.dp),
+            modifier = Modifier
+                .height(30.dp),
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
         )
     }
 }

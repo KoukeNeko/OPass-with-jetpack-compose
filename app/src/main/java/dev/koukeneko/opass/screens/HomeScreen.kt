@@ -1,6 +1,7 @@
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,6 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -223,7 +225,19 @@ fun HomeScreen(
                                 modifier = Modifier
                                     .padding(10.dp)
                                     .height(70.dp)
-                                    .width(100.dp)
+                                    .width(100.dp),
+//                                if dark mode or name include devfest, keep the original color
+                                colorFilter = if (event.displayName["zh"]?.contains("DevFest") == true) {
+                                    null
+                                } else {
+                                    ColorFilter.tint(
+                                        if (isSystemInDarkTheme()) {
+                                            Color.White
+                                        } else {
+                                            MaterialTheme.colorScheme.onSurface
+                                        }
+                                    )
+                                }
                             )
 
                             event.displayName["zh"]?.let {
@@ -298,7 +312,8 @@ fun HomeScreen(
                     modifier = Modifier
                         .width(250.dp)
                         .height(200.dp)
-                        .align(Alignment.BottomCenter)
+                        .align(Alignment.BottomCenter),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
                 )
             }
             Spacer(modifier = Modifier.height(10.dp))
