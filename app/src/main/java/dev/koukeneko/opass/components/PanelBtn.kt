@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 
 @Composable
 fun PanelBtn(
@@ -43,7 +44,7 @@ fun PanelBtn(
 @Composable
 fun PanelBtn(
     title: String,
-    icon: Painter,
+    iconUrl: String, // for AsyncImage
     onClick: () -> Unit,
     color: Color
 ) {
@@ -52,13 +53,9 @@ fun PanelBtn(
         onClick = onClick,
         color = color
     ) {
-        Icon(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(5.dp),
-            painter = icon,
+        AsyncImage(
+            model = iconUrl,
             contentDescription = title,
-            tint = MaterialTheme.colorScheme.onPrimary
         )
     }
 }

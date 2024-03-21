@@ -70,73 +70,6 @@ fun HomeScreen(
 ) {
 
 
-//    val buttons = listOf(
-//        PanelButton("快速通關", ticket()) {
-//            navController.navigate(
-//                "profile"
-//            )
-//        },
-//        PanelButton("議程", calendar_clock()) {
-//            navController.navigate(
-//                "profile"
-//            )
-//        },
-//        PanelButton("我的票券", qrcode()) {
-//            navController.navigate(
-//                "profile"
-//            )
-//        },
-//        PanelButton("大地遊戲", puzzle()) {
-//            navController.navigate(
-//                "profile"
-//            )
-//        },
-//        PanelButton("大會公告", speakerphone()) {
-//            navController.navigate(
-//                "profile"
-//            )
-//        },
-//        PanelButton("WiFi", wifi()) {
-//            navController.navigate(
-//                "profile"
-//            )
-//        },
-//        PanelButton("會場地圖", map()) {
-//            navController.navigate(
-//                "profile"
-//            )
-//        },
-//        PanelButton("合作夥伴", cash()) {
-//            navController.navigate(
-//                "profile"
-//            )
-//        },
-//        PanelButton("工作人員", user_grop()) {
-//            navController.navigate(
-//                "profile"
-//            )
-//        },
-//        PanelButton("個人贊助支持", heart()) {
-//            navController.navigate(
-//                "profile"
-//            )
-//        },
-//        PanelButton("Telegram", telegram()) {
-//            navController.navigate(
-//                "profile"
-//            )
-//        },
-//        PanelButton("Discord", discord()) {
-//            navController.navigate(
-//                "profile"
-//            )
-//        },
-//        PanelButton("IRC Log", chat()) {
-//            navController.navigate(
-//                "profile"
-//            )
-//        },
-//    )
     val buttons = remember { mutableStateListOf<PanelButton>() }
 
     var search_event by remember { mutableStateOf("") }
@@ -156,9 +89,11 @@ fun HomeScreen(
 //            make data fit PanelBtn
             val newButtons = it.map { btn ->
                 PanelButton(
-                    title = btn.displayText["zh"] ?: btn.displayText["en"]
-                ?: "未命名",
-                    icon = btn.feature,
+                    title = btn.displayText["zh"] ?: btn.displayText["en"] ?: "未命名",
+                    icon = when (btn.feature) {
+                        "webview" -> btn.icon ?: ""
+                        else -> btn.feature
+                    },
                     onClick = { /* Define onClick behavior here */ },
                     type = when (btn.feature) {
                         "webview" -> PanelButtonType.WEBVIEW
@@ -374,12 +309,21 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 items(buttons) { button ->
-                    PanelBtn(
-                        title = button.title,
-                        icon = iconMapper(button.icon),
-                        onClick = button.onClick,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    if (button.type == PanelButtonType.DEFAULT) {
+                        PanelBtn(
+                            title = button.title,
+                            icon = iconMapper(button.icon),
+                            onClick = button.onClick,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    } else if (button.type == PanelButtonType.WEBVIEW) {
+                        PanelBtn(
+                            title = button.title,
+                            iconUrl = button.icon,
+                            onClick = button.onClick,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
         }
@@ -406,11 +350,14 @@ fun iconMapper(iconName: String): ImageVector {
 }
 
 data class PanelButton(
-    val title: String, val icon: String, val onClick: () -> Unit, var type: PanelButtonType = PanelButtonType.DEFAULT
+    val title: String,
+    val icon: String,
+    val onClick: () -> Unit,
+    var type: PanelButtonType = PanelButtonType.DEFAULT
 )
 
 enum class PanelButtonType {
-    DEFAULT, WEBVIEW
+    DEFAULT, WEBVIEW, WIFI
 }
 
 
