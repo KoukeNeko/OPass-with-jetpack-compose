@@ -58,6 +58,8 @@ import dev.koukeneko.opass.R
 import dev.koukeneko.opass.components.AppBar
 import dev.koukeneko.opass.components.PanelBtn
 import dev.koukeneko.opass.structs.Event
+import dev.koukeneko.opass.structs.EventListItem
+import dev.koukeneko.opass.structs.Feature
 import kotlinx.coroutines.launch
 import java.util.logging.Logger
 
@@ -66,85 +68,110 @@ import java.util.logging.Logger
 fun HomeScreen(
     navController: NavController
 ) {
-    val buttons = listOf(
-        PanelButton("快速通關", ticket()) {
-            navController.navigate(
-                "profile"
-            )
-        },
-        PanelButton("議程", calendar_clock()) {
-            navController.navigate(
-                "profile"
-            )
-        },
-        PanelButton("我的票券", qrcode()) {
-            navController.navigate(
-                "profile"
-            )
-        },
-        PanelButton("大地遊戲", puzzle()) {
-            navController.navigate(
-                "profile"
-            )
-        },
-        PanelButton("大會公告", speakerphone()) {
-            navController.navigate(
-                "profile"
-            )
-        },
-        PanelButton("WiFi", wifi()) {
-            navController.navigate(
-                "profile"
-            )
-        },
-        PanelButton("會場地圖", map()) {
-            navController.navigate(
-                "profile"
-            )
-        },
-        PanelButton("合作夥伴", cash()) {
-            navController.navigate(
-                "profile"
-            )
-        },
-        PanelButton("工作人員", user_grop()) {
-            navController.navigate(
-                "profile"
-            )
-        },
-        PanelButton("個人贊助支持", heart()) {
-            navController.navigate(
-                "profile"
-            )
-        },
-        PanelButton("Telegram", telegram()) {
-            navController.navigate(
-                "profile"
-            )
-        },
-        PanelButton("Discord", discord()) {
-            navController.navigate(
-                "profile"
-            )
-        },
-        PanelButton("IRC Log", chat()) {
-            navController.navigate(
-                "profile"
-            )
-        },
-    )
 
+
+//    val buttons = listOf(
+//        PanelButton("快速通關", ticket()) {
+//            navController.navigate(
+//                "profile"
+//            )
+//        },
+//        PanelButton("議程", calendar_clock()) {
+//            navController.navigate(
+//                "profile"
+//            )
+//        },
+//        PanelButton("我的票券", qrcode()) {
+//            navController.navigate(
+//                "profile"
+//            )
+//        },
+//        PanelButton("大地遊戲", puzzle()) {
+//            navController.navigate(
+//                "profile"
+//            )
+//        },
+//        PanelButton("大會公告", speakerphone()) {
+//            navController.navigate(
+//                "profile"
+//            )
+//        },
+//        PanelButton("WiFi", wifi()) {
+//            navController.navigate(
+//                "profile"
+//            )
+//        },
+//        PanelButton("會場地圖", map()) {
+//            navController.navigate(
+//                "profile"
+//            )
+//        },
+//        PanelButton("合作夥伴", cash()) {
+//            navController.navigate(
+//                "profile"
+//            )
+//        },
+//        PanelButton("工作人員", user_grop()) {
+//            navController.navigate(
+//                "profile"
+//            )
+//        },
+//        PanelButton("個人贊助支持", heart()) {
+//            navController.navigate(
+//                "profile"
+//            )
+//        },
+//        PanelButton("Telegram", telegram()) {
+//            navController.navigate(
+//                "profile"
+//            )
+//        },
+//        PanelButton("Discord", discord()) {
+//            navController.navigate(
+//                "profile"
+//            )
+//        },
+//        PanelButton("IRC Log", chat()) {
+//            navController.navigate(
+//                "profile"
+//            )
+//        },
+//    )
+    val buttons = remember { mutableStateListOf<PanelButton>() }
 
     var search_event by remember { mutableStateOf("") }
 
-    val events = remember { mutableStateListOf<Event>() }
+    val events = remember { mutableStateListOf<EventListItem>() }
+    val event = remember { mutableStateOf<Event?>(null) }
 
     LaunchedEffect(key1 = true) {
-        val fetchedEvents = EventClient().getEvents()
+        val fetchedEvents = EventClient().getEventList()
         events.clear()
         events.addAll(fetchedEvents)
         Logger.getLogger("HomeScreen Fetched events").info("Fetched events: $fetchedEvents")
+
+        event.value = fetchedEvents.firstOrNull()?.let { EventClient().getEvent(it.eventId) }
+        buttons.clear()
+        event.value?.features?.let {
+//            make data fit PanelBtn
+            val newButtons = it.map { btn ->
+                PanelButton(
+                    title = btn.displayText["zh"] ?: btn.displayText["en"]
+                ?: "未命名",
+                    icon = btn.feature,
+                    onClick = { /* Define onClick behavior here */ },
+                    type = when (btn.feature) {
+                        "webview" -> PanelButtonType.WEBVIEW
+                        else -> PanelButtonType.DEFAULT
+                    }
+                )
+            }
+            buttons.clear()
+            buttons.addAll(newButtons)
+        }
+        Logger.getLogger("HomeScreen Fetched event").info("Fetched event: ${event.value}")
     }
+
 
     val filteredItems = events.filter { event ->
         event.displayName["zh"]?.contains(
@@ -349,7 +376,7 @@ fun HomeScreen(
                 items(buttons) { button ->
                     PanelBtn(
                         title = button.title,
-                        icon = button.icon,
+                        icon = iconMapper(button.icon),
                         onClick = button.onClick,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -357,8 +384,34 @@ fun HomeScreen(
             }
         }
     }
+
+}
+
+@Composable
+fun iconMapper(iconName: String): ImageVector {
+    return when (iconName.lowercase().trim()) {
+        "fastpass" -> ticket()
+        "discord" -> discord()
+        "ticket" -> qrcode()
+        "schedule" -> calendar_clock()
+        "announcement" -> speakerphone()
+        "wifi" -> wifi()
+        "venue" -> map()
+        "sponsors" -> cash()
+        "staffs" -> user_grop()
+        "telegram" -> telegram()
+        "im" -> chat()
+        else -> cube() // A default icon if the name doesn't match
+    }
 }
 
 data class PanelButton(
-    val title: String, val icon: ImageVector, val onClick: () -> Unit
+    val title: String, val icon: String, val onClick: () -> Unit, var type: PanelButtonType = PanelButtonType.DEFAULT
 )
+
+enum class PanelButtonType {
+    DEFAULT, WEBVIEW
+}
+
+
+

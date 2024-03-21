@@ -1,4 +1,9 @@
 import dev.koukeneko.opass.structs.Event
+import dev.koukeneko.opass.structs.EventDate
+import dev.koukeneko.opass.structs.EventListItem
+import dev.koukeneko.opass.structs.Feature
+import dev.koukeneko.opass.structs.PublishPeriod
+import dev.koukeneko.opass.structs.WiFiInfo
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.request.*
@@ -13,11 +18,11 @@ class EventClient {
             json()
         }
     }
-    private var baseUrl = "https://portal.opass.app/events/"
+    private var baseUrl = "https://portal.opass.app/"
 
-    suspend fun getEvents(): List<Event> {
+    suspend fun getEventList(): List<EventListItem> {
 
-        val response = client.get(baseUrl)
+        val response = client.get(baseUrl + "events/")
         val responseBody: String = response.body()
 
         val jsonElements = Json.parseToJsonElement(responseBody).jsonArray
@@ -29,11 +34,66 @@ class EventClient {
             val displayNameZh = jsonObject["display_name"]?.jsonObject?.get("zh")?.jsonPrimitive?.content ?: ""
             val logoUrl = jsonObject["logo_url"]?.jsonPrimitive?.content ?: ""
 
-            Event(
+            EventListItem(
                 eventId = eventId,
                 displayName = mapOf("en" to displayNameEn, "zh" to displayNameZh),
                 logoUrl = logoUrl
             )
         }
     }
+
+    suspend fun getEvent(eventId: String): Event {
+        val response = client.get(baseUrl + "events/$eventId/")
+        val responseBody: String = response.body()
+
+        val jsonObject = Json.parseToJsonElement(responseBody).jsonObject
+
+        // Assuming you have an appropriate constructor or method to parse these
+        val eventDate = EventDate(
+            start = jsonObject["event_date"]?.jsonObject?.get("start")?.jsonPrimitive?.content.orEmpty(),
+            end = jsonObject["event_date"]?.jsonObject?.get("end")?.jsonPrimitive?.content.orEmpty()
+        )
+
+        val publish = PublishPeriod(
+            start = jsonObject["publish"]?.jsonObject?.get("start")?.jsonPrimitive?.content ?: "",
+            end = jsonObject["publish"]?.jsonObject?.get("end")?.jsonPrimitive?.content ?: ""
+        )
+
+        val features = jsonObject["features"]?.jsonArray?.mapNotNull { featureElement ->
+            val featureObject = featureElement.jsonObject
+            Feature(
+                feature = featureObject["feature"]?.jsonPrimitive?.content ?: "",
+                displayText = mapOf(
+                    "en" to featureObject["display_text"]?.jsonObject?.get("en")?.jsonPrimitive?.content.orEmpty(),
+                    "zh" to featureObject["display_text"]?.jsonObject?.get("zh")?.jsonPrimitive?.content.orEmpty()
+                ),
+                visibleRoles = featureObject["visible_roles"]?.jsonArray?.map { it.jsonPrimitive.content },
+                url = featureObject["url"]?.jsonPrimitive?.content,
+                icon = featureObject["icon"]?.jsonPrimitive?.content,
+                wifi = featureObject["wifi"]?.jsonArray?.map { wifiElement ->
+                    val wifiObject = wifiElement.jsonObject
+                    return@map WiFiInfo( // Explicit return statement
+                        ssid = wifiObject["SSID"]?.jsonPrimitive?.content.orEmpty(),
+                        password = wifiObject["password"]?.jsonPrimitive?.content.orEmpty()
+                    )
+                }
+                    ?: listOf<WiFiInfo>() // Specify the type to ensure the compiler understands the expected return type
+
+            )
+        } ?: listOf()
+
+        return Event(
+            eventId = eventId,
+            displayName = mapOf(
+                "en" to jsonObject["display_name"]?.jsonObject?.get("en")?.jsonPrimitive?.content.orEmpty(),
+                "zh" to jsonObject["display_name"]?.jsonObject?.get("zh")?.jsonPrimitive?.content.orEmpty()
+            ),
+            logoUrl = jsonObject["logo_url"]?.jsonPrimitive?.content.orEmpty(),
+            eventWebsite = jsonObject["event_website"]?.jsonPrimitive?.content.orEmpty(),
+            eventDate = eventDate,
+            publish = publish,
+            features = features
+        )
+    }
+
 }
