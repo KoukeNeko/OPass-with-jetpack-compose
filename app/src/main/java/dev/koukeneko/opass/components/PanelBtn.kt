@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import cube
 
 @Composable
 fun PanelBtn(
@@ -54,13 +55,26 @@ fun PanelBtn(
         onClick = onClick,
         color = color
     ) {
-        AsyncImage(
-            model = iconUrl,
-            contentDescription = title,
-            modifier = Modifier
-                .height(30.dp),
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
-        )
+        // if iconUrl is empty, use default icon
+        if (iconUrl.isEmpty()){
+            Icon(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(5.dp),
+                imageVector = cube(),
+                contentDescription = title,
+                tint = MaterialTheme.colorScheme.onPrimary
+            )
+        }else {
+            AsyncImage(
+                model = iconUrl,
+                contentDescription = title,
+                modifier = Modifier
+                    .height(30.dp),
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary)
+            )
+        }
+
     }
 }
 

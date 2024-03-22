@@ -53,6 +53,8 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import dev.koukeneko.opass.EventViewModel
@@ -71,47 +73,37 @@ fun HomeScreen(
     navController: NavController,
 ) {
 
-    val buttons = remember { mutableStateListOf<PanelButton>() }
+    // Obtain the ViewModel scoped to this Composable
+    val eventViewModel: EventViewModel = viewModel()
+    // Collect UI state with lifecycle awareness
+    val uiState by eventViewModel.uiState.collectAsStateWithLifecycle()
 
-    var search_event by remember { mutableStateOf("") }
 
-    val events = remember { mutableStateListOf<EventListItem>() }
-    val event = remember { mutableStateOf<Event?>(null) }
+    var searchEvent by remember { mutableStateOf("") }
 
-    LaunchedEffect(key1 = true) {
-        val fetchedEvents = EventClient().getEventList()
-        events.clear()
-        events.addAll(fetchedEvents)
-        Logger.getLogger("HomeScreen Fetched events").info("Fetched events: $fetchedEvents")
+    val events = uiState.eventList
+    val currentEvent = uiState.currentEvent
 
-        event.value = fetchedEvents.firstOrNull()?.let { EventClient().getEvent(it.eventId) }
-        buttons.clear()
-        event.value?.features?.let {
-//            make data fit PanelBtn
-            val newButtons = it.map { btn ->
-                PanelButton(
-                    title = btn.displayText["zh"] ?: btn.displayText["en"] ?: "未命名",
-                    icon = when (btn.feature) {
-                        "webview" -> btn.icon ?: ""
-                        else -> btn.feature
-                    },
-                    onClick = { /* Define onClick behavior here */ },
-                    type = when (btn.feature) {
-                        "webview" -> PanelButtonType.WEBVIEW
-                        else -> PanelButtonType.DEFAULT
-                    }
-                )
+    // update buttons panel
+    val buttons = currentEvent?.features?.map { btn ->
+        PanelButton(
+            title = btn.displayText["zh"] ?: btn.displayText["en"] ?: "未命名",
+            icon = when (btn.feature) {
+                "webview" -> btn.icon ?: ""
+                else -> btn.feature
+            },
+            onClick = { /* Define onClick behavior here */ },
+            type = when (btn.feature) {
+                "webview" -> PanelButtonType.WEBVIEW
+                else -> PanelButtonType.DEFAULT
             }
-            buttons.clear()
-            buttons.addAll(newButtons)
-        }
-        Logger.getLogger("HomeScreen Fetched event").info("Fetched event: ${event.value}")
-    }
+        )
+    } ?: emptyList() // Provide an empty list as fallback
 
 
     val filteredItems = events.filter { event ->
         event.displayName["zh"]?.contains(
-            search_event, ignoreCase = true
+            searchEvent, ignoreCase = true
         ) == true
     }
 
@@ -134,7 +126,7 @@ fun HomeScreen(
 
 
     BottomSheetScaffold(topBar = {
-        AppBar(subtitle = "KoukeNeko", title = "SITCON 2024", rightIcon = {
+        AppBar(subtitle = "KoukeNeko", title = uiState.currentEvent?.displayName?.get("zh").orEmpty(), rightIcon = {
             IconButton(onClick = { /* Do something */ }) {
                 Icon(Icons.Filled.Settings, contentDescription = "Localized description")
             }
@@ -178,9 +170,9 @@ fun HomeScreen(
                             modifier = Modifier
                                 .fillParentMaxWidth()
                                 .padding(start = 15.dp),
-                            value = search_event,
+                            value = searchEvent,
                             onValueChange = {
-                                search_event = it
+                                searchEvent = it
                             })
                     }
                 }
@@ -214,7 +206,14 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.Absolute.SpaceBetween,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { /*TODO*/ }) {
+                            .clickable {
+                                // set current event id, viewModel will update the current event
+                                eventViewModel.setCurrentEventId(event.eventId)
+                                // hide bottom sheet
+                                scope.launch {
+                                    scaffoldState.bottomSheetState.partialExpand()
+                                }
+                            }) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
@@ -306,8 +305,8 @@ fun HomeScreen(
                     .height(180.dp)
             ) {
                 AsyncImage(
-                    model = "https://sitcon.org/branding/assets/logos/withname-white.png",
-                    contentDescription = "SITCON Logo",
+                    model = uiState.currentEvent?.logoUrl ?: "",
+                    contentDescription = uiState.currentEvent?.displayName?.get("zh").orEmpty(),
                     modifier = Modifier
                         .width(250.dp)
                         .height(180.dp)
