@@ -1,7 +1,6 @@
 package dev.koukeneko.opass.utils
 
 import android.util.Log
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.koukeneko.opass.api.EventClient
@@ -44,7 +43,7 @@ class EventViewModel : ViewModel() {
     // Handle event logic
 
     // Get Current Event
-    private suspend fun getCurrentEvent(eventId: String): Event {
+    suspend fun setCurrentEvent(eventId: String): Event {
         // Fetch event data
         val event = EventClient().getEvent(eventId)
         // Update UI state
@@ -67,20 +66,28 @@ class EventViewModel : ViewModel() {
         }
     }
 
-    fun setCurrentEventId(eventId: String) {
-        _uiState.value = _uiState.value.copy(currentEventId = eventId)
-        // Fetch current event data when event id is set
-        viewModelScope.launch {
-            getCurrentEvent(eventId)
+    suspend fun setCurrentEventId(eventId: String) {
+        if (eventId.isNullOrEmpty()) {
+            viewModelScope.launch {
+                setCurrentEvent(getEventList().first().eventId)
+                _uiState.value = _uiState.value.copy(currentEventId = getEventList().first().eventId)
+            }
+        }else{
+            _uiState.value = _uiState.value.copy(currentEventId = eventId)
+            // Fetch current event data when event id is set
+            viewModelScope.launch {
+                setCurrentEvent(eventId)
+            }
+            viewModelScope.launch {
+                // set session list when event id is set
+                setSessionList(setCurrentEvent(eventId).features.find {it.feature == "schedule"}?.url.orEmpty())
+            }
         }
-        viewModelScope.launch {
-            // set session list when event id is set
-            setSessionList(getCurrentEvent(eventId).features.find {it.feature == "schedule"}?.url.orEmpty())
-        }
+
     }
 
     // Get Session List
-    private suspend fun setSessionList(url: String): List<ScheduleItem> {
+    suspend fun setSessionList(url: String): List<ScheduleItem> {
         try {
             // Fetch session list data
             val sessionList = ScheduleClient().getSchedule(url)

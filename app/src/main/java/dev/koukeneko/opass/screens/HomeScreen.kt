@@ -42,7 +42,6 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -82,20 +81,25 @@ fun HomeScreen(
     Log.d("context", "currentFromStorage: $currentIdFromStorage")
     LaunchedEffect(currentIdFromStorage) {
 
-        currentIdFromStorage?.let {
-            eventViewModel.setCurrentEventId(it)
-        }
-        if (currentIdFromStorage == null || currentIdFromStorage!!.isEmpty()) {
-            val firstEventId = eventViewModel.getEventList().firstOrNull()?.eventId
-            Log.d("EventList", "Size: ${eventViewModel.getEventList().size}")
-            Log.d("EventList", "firstEventId: $firstEventId")
-            if (firstEventId != null) {
-                eventViewModel.setCurrentEventId(firstEventId)
-            } else {
-                // Handle the case where there are no events
-            }
+       try {
+           if (currentIdFromStorage == null) {
+               val firstEventId = eventViewModel.getEventList().firstOrNull()?.eventId
+               Log.d("EventList", "Size: ${eventViewModel.getEventList().size}")
+               Log.d("EventList", "firstEventId: $firstEventId")
+               if (firstEventId != null) {
+                   eventViewModel.setCurrentEvent(eventViewModel.getEventList().first().eventId)
+               } else {
+                   // Handle the case where there are no events
+               }
 
-        }
+           }else{
+               currentIdFromStorage?.let {
+                   eventViewModel.setCurrentEventId(it)
+               }
+           }
+       }catch (e: Exception){
+           Log.d("context", "currentFromStorage: $e")
+       }
     }
 
     // Collect UI state with lifecycle awareness
@@ -261,7 +265,9 @@ fun HomeScreen(
                                 .fillMaxWidth()
                                 .clickable {
                                     // set current event id, viewModel will update the current event
-                                    eventViewModel.setCurrentEventId(event.eventId)
+                                    scope.launch {
+                                        eventViewModel.setCurrentEvent(event.eventId)
+                                    }
                                     //save current event id to EventUiStateRepository
                                     scope.launch {
                                         EventUiStateRepository(context).saveCurrentEventId(event.eventId)
