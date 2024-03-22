@@ -74,6 +74,13 @@ fun HomeScreen(
 
     val context = LocalContext.current
 
+    val scope = rememberCoroutineScope()
+    val scaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = rememberStandardBottomSheetState(
+            initialValue = SheetValue.PartiallyExpanded, skipHiddenState = true
+        )
+    )
+
     // Obtain the ViewModel scoped to this Composable
     val eventViewModel: EventViewModel = viewModel()
 
@@ -84,12 +91,11 @@ fun HomeScreen(
        try {
            if (currentIdFromStorage == null) {
                val firstEventId = eventViewModel.getEventList().firstOrNull()?.eventId
-               Log.d("EventList", "Size: ${eventViewModel.getEventList().size}")
-               Log.d("EventList", "firstEventId: $firstEventId")
                if (firstEventId != null) {
                    eventViewModel.setCurrentEvent(eventViewModel.getEventList().first().eventId)
                } else {
                    // Handle the case where there are no events
+                   Log.d("EventList", "No events found")
                }
 
            }else{
@@ -104,11 +110,18 @@ fun HomeScreen(
 
     // Collect UI state with lifecycle awareness
     val uiState by eventViewModel.uiState.collectAsStateWithLifecycle()
-
-    var searchEvent by remember { mutableStateOf("") }
-
     val events = uiState.eventList
     val currentEvent = uiState.currentEvent
+    var searchEvent by remember { mutableStateOf("") }
+    val filteredItems = events.filter { event ->
+        event.displayName["zh"]?.contains(
+            searchEvent, ignoreCase = true
+        ) == true
+    }
+
+
+
+
 
     // update buttons panel
     val buttons = currentEvent?.features?.map { btn ->
@@ -150,18 +163,7 @@ fun HomeScreen(
     } ?: emptyList() // Provide an empty list as fallback
 
 
-    val filteredItems = events.filter { event ->
-        event.displayName["zh"]?.contains(
-            searchEvent, ignoreCase = true
-        ) == true
-    }
 
-    val scope = rememberCoroutineScope()
-    val scaffoldState = rememberBottomSheetScaffoldState(
-        bottomSheetState = rememberStandardBottomSheetState(
-            initialValue = SheetValue.PartiallyExpanded, skipHiddenState = true
-        )
-    )
 
     // Handle back button press when bottom sheet is expanded
     // If this is not handled, the back button will navigate to the previous screen ( exit the app )
