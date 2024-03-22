@@ -53,11 +53,6 @@ class EventViewModel : ViewModel() {
         return eventList
     }
 
-    // Get Current Event Id
-    fun getCurrentEventId(): String? {
-        return _uiState.value.currentEventId
-    }
-
     fun setCurrentEventId(eventId: String) {
         _uiState.value = _uiState.value.copy(currentEventId = eventId)
         // Fetch current event data when event id is set

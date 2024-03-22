@@ -1,8 +1,6 @@
 package dev.koukeneko.opass
 
 import HomeScreen
-import android.app.Activity
-import android.graphics.Color
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
@@ -12,36 +10,22 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.painterResource
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowCompat.*
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import dev.koukeneko.opass.screens.WebViewScreen
-import dev.koukeneko.opass.structs.BottomNavItem
 import dev.koukeneko.opass.ui.theme.OPassTheme
-
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
 
 
 class MainActivity : ComponentActivity() {
@@ -86,8 +70,7 @@ class MainActivity : ComponentActivity() {
 
                 // A surface container using the 'background' color from the theme
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
                     AppContent()
                 }
@@ -102,20 +85,25 @@ class MainActivity : ComponentActivity() {
 fun AppContent() {
     val navController = rememberNavController()
     NavHost(
-        navController = navController,
-        startDestination = "home",
-        modifier = Modifier.fillMaxSize()
+        navController = navController, startDestination = "home", modifier = Modifier.fillMaxSize()
     ) {
         composable("home") {
 
             HomeScreen(navController = navController)
 
         }
-        composable("web_view") {
+        composable(
+            "web_view/{title}/{url}",
+            arguments = listOf(
+                navArgument("url") { type = NavType.StringType },
+                navArgument("title") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val url = backStackEntry.arguments?.getString("url") ?: ""
+            val title = backStackEntry.arguments?.getString("title") ?: ""
             WebViewScreen(
-                navController = navController,
-                url = "https://sitcon.org/2024"
-            ) //TODO make url dynamic
+                navController = navController, url = url, title = title
+            )
         }
         composable("schedule") {
 

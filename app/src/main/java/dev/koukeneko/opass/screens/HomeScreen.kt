@@ -1,3 +1,5 @@
+import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -92,12 +94,34 @@ fun HomeScreen(
                 "webview" -> btn.icon ?: ""
                 else -> btn.feature
             },
-            onClick = { /* Define onClick behavior here */ },
+            onClick = {
+                when (btn.feature) {
+                    "webview" -> if (btn.url != null) {
+                        val encodedUrl = Uri.encode(btn.url)
+                        navController.navigate("web_view/${btn.displayText["zh"]}/$encodedUrl")
+                    }
+
+                    "telegram" -> if (btn.url != null) {
+
+                    }
+
+                    else -> {
+                        // web-view but feature is not set to web-view
+                        if (btn.url != null) {
+                            val encodedUrl = Uri.encode(btn.url)
+                            navController.navigate("web_view/${btn.displayText["zh"]}/$encodedUrl")
+                        }
+                    }
+                }
+
+                Toast.makeText(navController.context, "Button clicked", Toast.LENGTH_SHORT).show()
+            },
             type = when (btn.feature) {
                 "webview" -> PanelButtonType.WEBVIEW
                 else -> PanelButtonType.DEFAULT
             }
         )
+
     } ?: emptyList() // Provide an empty list as fallback
 
 
@@ -126,23 +150,30 @@ fun HomeScreen(
 
 
     BottomSheetScaffold(topBar = {
-        AppBar(subtitle = "KoukeNeko", title = uiState.currentEvent?.displayName?.get("zh").orEmpty(), rightIcon = {
-            IconButton(onClick = { /* Do something */ }) {
-                Icon(Icons.Filled.Settings, contentDescription = "Localized description")
-            }
-        }, leftIcon = {
-            IconButton(onClick = {
-                scope.launch {
-                    scaffoldState.bottomSheetState.expand()
+        AppBar(subtitle = "KoukeNeko",
+            title = uiState.currentEvent?.displayName?.get("zh").orEmpty(),
+            rightIcon = {
+                IconButton(onClick = {
+                    Toast.makeText(
+                        navController.context, "Button clicked", Toast.LENGTH_SHORT
+                    ).show()
+                }) {
+                    Icon(Icons.Filled.Settings, contentDescription = "Localized description")
                 }
-            }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.rounded_login_24),
-                    tint = MaterialTheme.colorScheme.onSurface,
-                    contentDescription = "Localized description",
-                )
-            }
-        })
+            },
+            leftIcon = {
+                IconButton(onClick = {
+                    scope.launch {
+                        scaffoldState.bottomSheetState.expand()
+                    }
+                }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.rounded_stack_24),
+                        tint = MaterialTheme.colorScheme.onSurface,
+                        contentDescription = "Localized description",
+                    )
+                }
+            })
     }, scaffoldState = scaffoldState, sheetPeekHeight = 90.dp, sheetContent = {
         LazyColumn(
             modifier = Modifier
@@ -311,7 +342,13 @@ fun HomeScreen(
                         .width(250.dp)
                         .height(180.dp)
                         .align(Alignment.BottomCenter),
-                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+                    colorFilter = if (uiState.currentEvent?.displayName?.get("zh")
+                            ?.contains("DevFest", ignoreCase = true) == true
+                    ) {
+                        null
+                    } else {
+                        ColorFilter.tint(MaterialTheme.colorScheme.primary)
+                    }
                 )
             }
             Spacer(modifier = Modifier.height(10.dp))
