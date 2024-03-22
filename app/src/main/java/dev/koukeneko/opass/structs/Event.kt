@@ -11,19 +11,51 @@ data class Event(
     val eventDate: EventDate,
     val publish: PublishPeriod,
     val features: List<Feature>
-)
+) {
+    companion object {
+        fun fromString(orEmpty: String): Event {
+            return Event(
+                eventId = orEmpty,
+                displayName = mapOf("en" to orEmpty, "zh" to orEmpty),
+                logoUrl = orEmpty,
+                eventWebsite = orEmpty,
+                eventDate = EventDate.fromString(orEmpty),
+                publish = PublishPeriod.fromString(orEmpty),
+                features = listOf()
+            )
+        }
+    }
+}
+
+private fun PublishPeriod.Companion.fromString(orEmpty: String): PublishPeriod {
+    return PublishPeriod(
+        start = orEmpty,
+        end = orEmpty
+    )
+}
+
+private fun EventDate.Companion.fromString(orEmpty: String): EventDate {
+    return EventDate(
+        start = orEmpty,
+        end = orEmpty
+    )
+}
 
 @Serializable
 data class EventDate(
     val start: String,
     val end: String
-)
+) {
+    companion object
+}
 
 @Serializable
 data class PublishPeriod(
     val start: String,
     val end: String
-)
+) {
+    companion object
+}
 
 @Serializable
 data class Feature(

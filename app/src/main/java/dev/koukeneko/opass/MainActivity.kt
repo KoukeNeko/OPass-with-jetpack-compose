@@ -2,19 +2,17 @@ package dev.koukeneko.opass
 
 import HomeScreen
 import android.os.Bundle
+import android.util.Log
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -24,6 +22,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import dev.koukeneko.opass.screens.ScheduleScreen
 import dev.koukeneko.opass.screens.WebViewScreen
 import dev.koukeneko.opass.ui.theme.OPassTheme
 
@@ -68,6 +67,9 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
+
+
+
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
@@ -88,31 +90,26 @@ fun AppContent() {
         navController = navController, startDestination = "home", modifier = Modifier.fillMaxSize()
     ) {
         composable("home") {
-
-            HomeScreen(navController = navController)
-
+            HomeScreen(
+                navController = navController,
+            )
         }
         composable(
             "web_view/{title}/{url}",
-            arguments = listOf(
-                navArgument("url") { type = NavType.StringType },
-                navArgument("title") { type = NavType.StringType }
-            )
+            arguments = listOf(navArgument("url") { type = NavType.StringType },
+                navArgument("title") { type = NavType.StringType })
         ) { backStackEntry ->
             val url = backStackEntry.arguments?.getString("url") ?: ""
             val title = backStackEntry.arguments?.getString("title") ?: ""
+            Log.d("WebViewScreen", "url: $url, title: $title")
             WebViewScreen(
                 navController = navController, url = url, title = title
             )
         }
         composable("schedule") {
-
-            Column {
-                Button(onClick = { navController.popBackStack() }) {
-                    Text("Go to home")
-                }
-            }
-
+            ScheduleScreen(
+                navController = navController,
+            )
         }
 
 

@@ -55,7 +55,7 @@ fun WebViewScreen(
 
                 webViewClient = WebViewClient()
 
-                settings.userAgentString = "Mozilla/5.0 (Linux; Android 10; SM-G973F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Mobile Safari/537.36"
+                settings.userAgentString = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15"
                 settings.javaScriptEnabled = true
                 settings.javaScriptCanOpenWindowsAutomatically = true
                 settings.domStorageEnabled = true
@@ -66,6 +66,7 @@ fun WebViewScreen(
                 settings.setSupportZoom(true)
             }
         }, update = { webView ->
+            var temp = "https://metallica-giants-gras-admission.trycloudflare.com/"
             webView.loadUrl(url)
         })
     }
