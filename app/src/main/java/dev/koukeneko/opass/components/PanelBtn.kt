@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import cube
@@ -87,7 +88,6 @@ private fun PanelBtnBase(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-
     ) {
         IconButton(
             onClick = onClick,
@@ -98,7 +98,7 @@ private fun PanelBtnBase(
             content()
         }
         Spacer(modifier = Modifier.padding(2.dp))
-        Text(title, style = MaterialTheme.typography.bodySmall)
+        Text(title, style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)
     }
 }
 
