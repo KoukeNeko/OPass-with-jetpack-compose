@@ -7,4 +7,6 @@ data class EventListItem(
     val eventId: String,
     val displayName: Map<String, String>,
     val logoUrl: String,
-)
+) {
+    companion object
+}

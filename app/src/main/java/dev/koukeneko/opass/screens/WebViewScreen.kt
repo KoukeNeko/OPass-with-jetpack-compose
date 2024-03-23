@@ -53,6 +53,11 @@ fun WebViewScreen(
         AndroidView(modifier = Modifier.padding(it), factory = { context ->
             WebView(context).apply {
 
+                layoutParams = android.view.ViewGroup.LayoutParams(
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                    android.view.ViewGroup.LayoutParams.MATCH_PARENT
+                )
+
                 webViewClient = WebViewClient()
 
                 settings.userAgentString = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15"
@@ -63,6 +68,7 @@ fun WebViewScreen(
                 settings.useWideViewPort = true
                 settings.allowContentAccess = true
                 settings.allowFileAccess = true
+                settings.setSupportMultipleWindows(true)
                 settings.setSupportZoom(true)
             }
         }, update = { webView ->
